@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -279,9 +280,15 @@ func genLabels(m ceilometer.Metric, publisher string, cNameShards []string) ([]s
 		index++
 	}
 	if len(m.ResourceMetadata.UserMetadata) != 0 {
-		for key, value := range m.ResourceMetadata.UserMetadata {
+		// Sort keys so label order is stable across Go map iteration.
+		metaKeys := make([]string, 0, len(m.ResourceMetadata.UserMetadata))
+		for key := range m.ResourceMetadata.UserMetadata {
+			metaKeys = append(metaKeys, key)
+		}
+		sort.Strings(metaKeys)
+		for _, key := range metaKeys {
 			labelKeys[index] = key
-			labelVals[index] = value
+			labelVals[index] = m.ResourceMetadata.UserMetadata[key]
 			index++
 		}
 	}

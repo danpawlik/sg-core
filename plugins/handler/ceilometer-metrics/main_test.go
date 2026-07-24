@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sort"
 	"testing"
 	"time"
 
@@ -65,6 +66,7 @@ func TestCeilometerIncomingJSON(t *testing.T) {
 		t.Errorf("failed configuring ceilometer handler plugin: %s", err.Error())
 	}
 
+	metricsUT = []data.Metric{}
 	testData, err := os.ReadFile("messages/metric-tests.json")
 	if err != nil {
 		t.Errorf("failed loading test data: %s", err.Error())
@@ -177,6 +179,38 @@ func TestGenLabelsSizes(t *testing.T) {
 		// should have 11 labels
 		assert.Equal(t, len(labelKeys), 11)
 
+	})
+
+	t.Run("user metadata labels are sorted", func(t *testing.T) {
+		metric := ceilometer.Metric{
+			Source:        "openstack",
+			CounterName:   "cpu",
+			CounterType:   "gauge",
+			CounterUnit:   "ns",
+			CounterVolume: 1,
+			UserID:        "user_id",
+			UserName:      "user_name",
+			ProjectID:     "project_id",
+			ProjectName:   "project_name",
+			ResourceID:    "resource_id",
+			Timestamp:     "2021-03-30T15:20:19.891893",
+			ResourceMetadata: ceilometer.Metadata{
+				Host: "host1",
+				UserMetadata: map[string]string{
+					"zebra":  "z",
+					"apple":  "a",
+					"middle": "m",
+				},
+			},
+		}
+
+		labelKeys, labelVals := genLabels(metric, "node-0", []string{"cpu"})
+
+		assert.Equal(t, len(labelKeys), len(labelVals))
+		metaStart := len(labelKeys) - 3
+		assert.Equal(t, []string{"apple", "middle", "zebra"}, labelKeys[metaStart:])
+		assert.Equal(t, []string{"a", "m", "z"}, labelVals[metaStart:])
+		assert.Equal(t, true, sort.StringsAreSorted(labelKeys[metaStart:]))
 	})
 
 }
