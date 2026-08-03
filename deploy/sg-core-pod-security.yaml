@@ -1,0 +1,24 @@
+# Reference securityContext for sg-core container deployments.
+# Apply these settings in your Pod spec or Helm values to satisfy
+# CIS Kubernetes Benchmark 5.2.6 and OWASP K01.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sg-core
+  labels:
+    app: sg-core
+spec:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - name: sg-core
+      image: sg-core:latest
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
