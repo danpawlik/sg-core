@@ -8,6 +8,7 @@ import (
 
 	"github.com/infrawatch/apputils/logging"
 	"github.com/infrawatch/sg-core/pkg/bus"
+	"github.com/infrawatch/sg-core/pkg/config"
 	"github.com/infrawatch/sg-core/pkg/data"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -238,7 +239,7 @@ func TestElasticsearchApp(t *testing.T) {
 		assert.Equal(t, "", es.configuration.TLSCaCert)
 		assert.Equal(t, false, es.configuration.UseBasicAuth)
 		assert.Equal(t, "", es.configuration.User)
-		assert.Equal(t, "", es.configuration.Password)
+		assert.Equal(t, config.Secret(""), es.configuration.Password)
 		assert.Equal(t, 1, es.configuration.BufferSize)
 		assert.Equal(t, false, es.configuration.BulkIndex)
 		assert.Equal(t, 3, es.configuration.IndexWorkers)

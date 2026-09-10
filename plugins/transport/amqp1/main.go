@@ -30,8 +30,8 @@ func rate() int64 {
 }
 
 type configT struct {
-	URI          string `validate:"required"`
-	Channel      string `validate:"required"`
+	URI          config.Secret `validate:"required"` // may embed user:pass, so redacted in logs
+	Channel      string        `validate:"required"`
 	LinkCredit   uint32 `yaml:"linkCredit"`
 	DumpMessages struct {
 		Enabled bool
@@ -64,7 +64,7 @@ func sendMessage(msg interface{}, w transport.WriteFn, logger *logging.Logger) {
 func (at *AMQP1) Run(ctx context.Context, w transport.WriteFn, done chan bool) {
 	var err error
 	// connect
-	at.conn, err = amqp.Dial(at.conf.URI)
+	at.conn, err = amqp.Dial(string(at.conf.URI))
 	if err != nil {
 		at.logger.Metadata(logging.Metadata{"plugin": appname, "error": err})
 		at.logger.Error("failed to connect")
