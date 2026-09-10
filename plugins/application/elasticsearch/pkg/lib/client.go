@@ -71,7 +71,7 @@ func (esc *Client) Connect(cfg *AppConfig) error {
 	}
 	if cfg.UseBasicAuth {
 		esCfg.Username = cfg.User
-		esCfg.Password = cfg.Password
+		esCfg.Password = string(cfg.Password)
 	}
 
 	esc.conn, err = esv7.NewClient(esCfg)

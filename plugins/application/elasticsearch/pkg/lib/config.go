@@ -1,5 +1,7 @@
 package lib
 
+import "github.com/infrawatch/sg-core/pkg/config"
+
 // AppConfig holds configuration for Elasticsearch client
 type AppConfig struct {
 	HostURL       string   `yaml:"hostURL"`
@@ -10,7 +12,7 @@ type AppConfig struct {
 	TLSCaCert     string   `yaml:"tlsCaCert"`
 	UseBasicAuth  bool     `yaml:"useBasicAuth"`
 	User          string   `yaml:"user"`
-	Password      string   `yaml:"password"`
+	Password      config.Secret `yaml:"password"`
 	BufferSize    int      `yaml:"bufferSize"`
 	BulkIndex     bool     `yaml:"bulkIndex"`
 	ResetIndices  []string `yaml:"resetIndices"`
